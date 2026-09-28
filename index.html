@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NSBE Family Feud — Host</title>
+<style>
+:root{--navy:#07133f;--blue:#0f3a91;--gold:#f2bf3e;--gold2:#ffe27b;--red:#df3434;--green:#1b9d61}
+*{box-sizing:border-box}body{margin:0;background:#eef2f8;color:#16213f;font-family:Arial,Helvetica,sans-serif}
+button,select{font:inherit}.top{position:sticky;top:0;z-index:8;background:var(--navy);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;box-shadow:0 4px 18px #0004}
+.brand{font-weight:1000;color:var(--gold2);letter-spacing:.8px}.btn{border:0;border-radius:10px;padding:10px 12px;font-weight:900;cursor:pointer}.gold{background:var(--gold);color:#432e00}.blue{background:#174293;color:#fff}.light{background:#e9eef8;color:#18356e}.red{background:#ffe1e1;color:#961c1c}.green{background:#dcf4e7;color:#12623d}
+.wrap{max-width:1260px;margin:18px auto;padding:0 15px 40px;display:grid;grid-template-columns:315px 1fr;gap:16px}.side{display:flex;flex-direction:column;gap:14px}.card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 8px 24px #1d2d5b1c}
+h3{margin:0 0 10px}select{width:100%;padding:9px;border:1px solid #cbd3e3;border-radius:9px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}.scorebox{background:#0b1c55;color:#fff;border-radius:12px;text-align:center;padding:10px}.lbl{font-size:.75rem;font-weight:900;letter-spacing:1.2px;color:#c7d4ff}.score{font:900 2rem/1 "Courier New",monospace;color:#ffd65e;margin:6px 0}.bank{background:#102662;color:#fff;border-radius:12px;padding:10px;text-align:center;margin-top:10px}.bank strong{font-size:1.8rem;color:#ffd65e}
+.strikes{display:flex;justify-content:center;gap:8px;margin:10px 0}.x{width:44px;height:44px;border-radius:8px;background:#350909;color:#ff4545;border:2px solid #ff8080;display:grid;place-items:center;font-size:2rem;font-weight:900;opacity:.2}.x.on{opacity:1;box-shadow:0 0 13px #ff333366}
+.tip{background:#fff8d8;border:1px solid #ecd173;border-radius:12px;padding:12px;font-size:.9rem;line-height:1.4}.qnum{font-size:.78rem;letter-spacing:1.3px;color:#73809c;font-weight:900}.q{font-size:clamp(1.35rem,2.6vw,2.1rem);font-weight:1000;line-height:1.15;margin:6px 0 14px}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px}.arow{display:grid;grid-template-columns:32px 1fr 50px 92px;gap:8px;align-items:center;border:2px solid #dce3ef;border-radius:11px;padding:9px;background:#f8faff}.num{width:29px;height:29px;border-radius:50%;display:grid;place-items:center;background:#143c8d;color:#fff;font-weight:900}.at{font-weight:800}.pt{font-weight:900;color:#163a88;text-align:center}.rv{border:0;border-radius:8px;padding:8px;background:#173f91;color:#fff;font-weight:900;cursor:pointer}.rv.on{background:var(--green)}
+.hidden{display:none!important}.fmhead{display:flex;justify-content:space-between;align-items:center}.timer{font:900 2.2rem/1 "Courier New",monospace;background:#fff0ad;color:#12377f;border:2px solid #dfbb3c;border-radius:12px;padding:8px 12px}.reps{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.rep{border:1px solid #ccd5e6;border-radius:9px;padding:8px 10px;background:#f5f7fb;font-weight:900;cursor:pointer}.rep.active{background:#173f91;color:#fff}
+.fmq{border:2px solid #dde4f0;border-radius:12px;padding:11px;margin-bottom:9px}.fmqt{font-weight:900;margin-bottom:8px}.opts{display:flex;gap:6px;flex-wrap:wrap}.opt{border:1px solid #cdd6e8;border-radius:999px;padding:7px 10px;background:#fff;cursor:pointer;font-weight:800}.opt.sel{background:#173f91;color:#fff}.opt.used{opacity:.35}.opt.zero{background:#fff0f0;color:#992121}
+.note{font-size:.84rem;color:#65708a;line-height:1.4}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}.answers{grid-template-columns:1fr}.grid4{grid-template-columns:1fr 1fr}.top{position:static}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="brand">NSBE FAMILY FEUD — PRIVATE HOST CONSOLE</div>
+  <div>
+    <button class="btn blue" onclick="openAudience()">OPEN AUDIENCE BOARD ↗</button>
+    <button class="btn gold" onclick="switchMode()">SWITCH TO <span id="modeLabel">FAST MONEY</span></button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="side">
+    <div class="card" id="nav">
+      <h3>Round</h3>
+      <select id="sel" onchange="go(+this.value)"></select>
+      <div class="grid2" style="margin-top:8px">
+        <button class="btn light" onclick="prev()">← Back</button>
+        <button class="btn light" onclick="next()">Next →</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Scores</h3>
+      <div class="scores" id="scoreCards"></div>
+      <div class="grid2" style="margin-top:8px">
+        <button class="btn green" onclick="addTeam()">+ Add Team</button>
+        <button class="btn light" onclick="removeTeam()">− Remove Last Team</button>
+      </div>
+      <div class="bank" id="bankBox">ROUND BANK<br><strong id="bank">0</strong></div>
+      <div id="strikeArea">
+        <div class="strikes"><div class="x" id="x1">X</div><div class="x" id="x2">X</div><div class="x" id="x3">X</div></div>
+        <div class="grid2"><button class="btn red" onclick="strike()">+ Strike</button><button class="btn light" onclick="clearX()">Clear</button></div>
+      </div>
+    </div>
+
+    <div class="tip"><b>Host setup:</b> Open the audience board, drag that window to the projector, and keep this page private. Click the exact answer here when it’s guessed.</div>
+    <div class="card note"><b>Important:</b> These are simulated survey counts. Like real Family Feud boards, the displayed answers do <b>not</b> have to total 100 because some survey responses may not make the board.</div>
+  </div>
+
+  <div class="card">
+    <div id="regular">
+      <div class="qnum" id="qnum"></div>
+      <div class="q" id="question"></div>
+      <div class="answers" id="answers"></div>
+      <div class="grid4" style="margin-top:13px">
+        <button class="btn light" onclick="resetRound()">Reset round</button>
+        <button class="btn light" onclick="revealAll()">Reveal all</button>
+        <button class="btn red" onclick="resetGame()">Reset game</button>
+        <button class="btn gold" onclick="openAudience()">Audience board</button>
+      </div>
+    </div>
+
+    <div id="fastMode" class="hidden">
+      <div class="fmhead">
+        <div><div class="qnum">FINAL ROUND</div><div class="q" style="margin:0">FAST MONEY</div></div>
+        <div class="timer" id="timer">60</div>
+      </div>
+      <div class="reps" id="reps"></div>
+      <div class="grid4" style="margin-bottom:12px">
+        <button class="btn green" onclick="startT()">Start 60 sec</button>
+        <button class="btn light" onclick="pauseT()">Pause</button>
+        <button class="btn light" onclick="resetT()">Reset timer</button>
+        <button class="btn gold" onclick="revealFM()">Reveal on audience</button>
+      </div>
+      <div id="fmqs"></div>
+      <b>Representative score: <span id="repScore">0</span></b><br>
+      <b id="fmTotals"></b>
+    </div>
+  </div>
+</div>
+
+<script>
+const D={"regular": [{"q": "Name a fast-food restaurant people are WAY too loyal to.", "a": [["In-N-Out", 29], ["Chick-fil-A", 24], ["Raising Cane’s", 18], ["McDonald’s", 13], ["Taco Bell", 9], ["Arby’s", 4]]}, {"q": "Name an artist you are NOT letting somebody skip when they come on the aux.", "a": [["Michael Jackson", 24], ["Drake", 20], ["YoungBoy", 15], ["Beyoncé", 13], ["Giveon", 10], ["Bryson Tiller", 8]]}, {"q": "Name something students do when they have absolutely NO idea how to solve a problem.", "a": [["ChatGPT / AI", 36], ["Google it", 22], ["Ask a friend/classmate", 14], ["Watch YouTube", 10], ["Ask the professor / TA", 7], ["Guess / wing it", 4]]}, {"q": "Name a major people assume is harder than people think it is.", "a": [["Accounting", 28], ["Biology", 22], ["Philosophy", 16], ["Economics", 12], ["Foreign Language", 9], ["Finance", 6]]}, {"q": "Name a reason you would immediately mute a group chat.", "a": [["Too many notifications", 34], ["Arguing / drama", 23], ["Nothing in it concerns me", 12], ["Spam / nonstop memes", 10], ["It’s active at 2 AM", 7], ["Too many people I don’t know", 4]]}, {"q": "Name one of the top food spots on Santa Clara University’s campus.", "a": [["Spice Market", 28], ["Fire", 22], ["Global Grill", 17], ["Chef’s Table", 13], ["Mission Bakery", 9], ["The Cellar", 6]]}, {"q": "Name something you would refuse to give up for an entire year.", "a": [["My phone", 31], ["Wi-Fi", 18], ["Music", 15], ["My car", 9], ["My favorite food", 8], ["Social media", 7]]}, {"q": "Name an element from the periodic table that almost everyone knows.", "a": [["Oxygen", 27], ["Gold", 20], ["Hydrogen", 16], ["Carbon", 11], ["Iron", 8], ["Helium", 6]]}, {"q": "Name something a Black parent might say when you ask for McDonald’s.", "a": [["“We have food at home.”", 47], ["“You got McDonald’s money?”", 24], ["“No / maybe later.”", 11], ["“Do I look like I’m made of money?”", 8], ["“Ask your other parent.”", 4]]}, {"q": "Name a STEM major you’d want on your team during a zombie apocalypse.", "a": [["Nursing / Pre-Med", 28], ["Environmental Science", 20], ["Mechanical Engineering", 17], ["Electrical Engineering", 13], ["Civil Engineering", 9], ["Computer Science", 6]]}], "fast": [{"q": "Name something college students are always tired from.", "a": [["Not getting enough sleep", 38], ["Studying / homework", 24], ["Classes", 13], ["Work / a job", 9], ["Partying / social life", 6], ["Commuting", 4]]}, {"q": "Name an app you probably use every single day.", "a": [["TikTok", 26], ["Instagram", 22], ["Messages", 16], ["YouTube", 11], ["Spotify", 9], ["Snapchat", 7]]}, {"q": "Name something you would expect to find in an engineer’s backpack.", "a": [["Laptop", 41], ["Calculator", 20], ["Charger", 14], ["Notebook", 8], ["Water bottle", 5], ["Cables / tools", 4]]}, {"q": "Name a food people commonly order late at night.", "a": [["Pizza", 27], ["Burgers / fries", 18], ["Tacos", 15], ["Wings", 11], ["Ramen / noodles", 9], ["Sweet treat", 5]]}, {"q": "Name something you would buy immediately if you suddenly became rich.", "a": [["A house", 38], ["A car", 24], ["A vacation / trip", 13], ["Help family", 8], ["Designer clothes / shoes", 6], ["Pay off debt", 4]]}]};
+let mode="regular",cur=0,rev=D.regular.map(q=>q.a.map(()=>false)),xs=0,aud=null;
+let teams=["A","B"];
+let scores={A:0,B:0};
+let rep="A1";
+let fm={A1:Array(5).fill(null),A2:Array(5).fill(null),B1:Array(5).fill(null),B2:Array(5).fill(null)};
+let fmShow=false,sec=60,timerId=null;
+
+function repList(){return teams.flatMap(t=>[t+"1",t+"2"])}
+function repTeam(r){return r.slice(0,-1)}
+function repNum(r){return r.slice(-1)}
+function renderTeamCards(){
+ scoreCards.innerHTML="";
+ teams.forEach(t=>{
+   let box=document.createElement("div");
+   box.className="scorebox";
+   box.innerHTML=`<div class="lbl">TEAM ${t}</div><div class="score">${scores[t]||0}</div><button class="btn gold" onclick="award('${t}')">Award bank</button>`;
+   scoreCards.appendChild(box)
+ })
+}
+function addTeam(){
+ if(teams.length>=26){alert("Maximum 26 teams.");return}
+ const t=String.fromCharCode(65+teams.length);
+ teams.push(t);scores[t]=0;fm[t+"1"]=Array(5).fill(null);fm[t+"2"]=Array(5).fill(null);
+ buildReps();renderTeamCards();renderFM();sync()
+}
+function removeTeam(){
+ if(teams.length<=2){alert("Keep at least two teams for Family Feud.");return}
+ const t=teams[teams.length-1];
+ if(repTeam(rep)===t)rep="A1";
+ teams.pop();delete scores[t];delete fm[t+"1"];delete fm[t+"2"];
+ buildReps();renderTeamCards();renderFM();sync()
+}
+
+function init(){
+ D.regular.forEach((q,i)=>{let o=document.createElement("option");o.value=i;o.textContent=(i+1)+". "+q.q;sel.appendChild(o)});
+ buildReps();renderTeamCards();render();renderFM()
+}
+function switchMode(){
+ mode=mode==="regular"?"fast":"regular";
+ regular.classList.toggle("hidden",mode!=="regular");fastMode.classList.toggle("hidden",mode!=="fast");
+ nav.classList.toggle("hidden",mode!=="regular");bankBox.classList.toggle("hidden",mode!=="regular");strikeArea.classList.toggle("hidden",mode!=="regular");
+ modeLabel.textContent=mode==="regular"?"FAST MONEY":"REGULAR ROUNDS";sync()
+}
+function render(){
+ let q=D.regular[cur];sel.value=cur;qnum.textContent=`QUESTION ${cur+1} OF ${D.regular.length}`;question.textContent=q.q;answers.innerHTML="";
+ q.a.forEach((p,i)=>{let r=document.createElement("div");r.className="arow";r.innerHTML=`<div class="num">${i+1}</div><div class="at">${p[0]}</div><div class="pt">${p[1]}</div><button class="rv ${rev[cur][i]?"on":""}" onclick="toggle(${i})">${rev[cur][i]?"REVEALED":"REVEAL"}</button>`;answers.appendChild(r)});
+ bank.textContent=getBank();renderTeamCards();for(let i=1;i<=3;i++)document.getElementById("x"+i).classList.toggle("on",i<=xs);sync()
+}
+function getBank(){return D.regular[cur].a.reduce((s,p,i)=>s+(rev[cur][i]?p[1]:0),0)}
+function toggle(i){rev[cur][i]=!rev[cur][i];render()}
+function strike(){xs=Math.min(3,xs+1);render()}
+function clearX(){xs=0;render()}
+function award(t){scores[t]+=getBank();render()}
+function go(i){cur=i;xs=0;render()}
+function prev(){if(cur>0)go(cur-1)}
+function next(){if(cur<D.regular.length-1)go(cur+1)}
+function resetRound(){rev[cur]=D.regular[cur].a.map(()=>false);xs=0;render()}
+function revealAll(){rev[cur]=D.regular[cur].a.map(()=>true);render()}
+
+function buildReps(){
+ reps.innerHTML="";
+ repList().forEach(r=>{let b=document.createElement("button");b.className="rep"+(r===rep?" active":"");b.textContent=`Team ${repTeam(r)} — Rep ${repNum(r)}`;
+ b.onclick=()=>{rep=r;fmShow=false;resetT();buildReps();renderFM();sync()};reps.appendChild(b)})
+}
+function used(qi,oi){return repNum(rep)==="2" && fm[repTeam(rep)+"1"][qi]===oi}
+function choose(qi,oi){if(used(qi,oi))return;fm[rep][qi]=oi;renderFM()}
+function rscore(r){return fm[r].reduce((s,oi,qi)=>s+(oi>=0?D.fast[qi].a[oi][1]:0),0)}
+function tscore(t){return rscore(t+"1")+rscore(t+"2")}
+function renderFM(){
+ fmqs.innerHTML="";
+ D.fast.forEach((q,qi)=>{
+   let d=document.createElement("div");d.className="fmq";
+   let ops=q.a.map((p,oi)=>`<button class="opt ${fm[rep][qi]===oi?"sel":""} ${used(qi,oi)?"used":""}" ${used(qi,oi)?"disabled":""} onclick="choose(${qi},${oi})">${p[0]} · ${p[1]}</button>`).join("");
+   d.innerHTML=`<div class="fmqt">${qi+1}. ${q.q}</div><div class="opts">${ops}<button class="opt zero ${fm[rep][qi]===-1?"sel":""}" onclick="choose(${qi},-1)">Other / 0</button></div>`;
+   fmqs.appendChild(d)
+ });
+ repScore.textContent=rscore(rep);
+ fmTotals.textContent=teams.map(t=>`Team ${t} Fast Money: ${tscore(t)}`).join("   |   ")
+}
+function startT(){if(timerId)return;timerId=setInterval(()=>{sec--;timer.textContent=sec;if(sec<=0){pauseT();timer.textContent="TIME!"}},1000)}
+function pauseT(){clearInterval(timerId);timerId=null}
+function resetT(){pauseT();sec=60;timer.textContent=60}
+function revealFM(){fmShow=true;sync()}
+
+function resetGame(){
+ if(!confirm("Reset the whole game?"))return;
+ cur=0;rev=D.regular.map(q=>q.a.map(()=>false));xs=0;
+ scores=Object.fromEntries(teams.map(t=>[t,0]));
+ fm={};teams.forEach(t=>{fm[t+"1"]=Array(5).fill(null);fm[t+"2"]=Array(5).fill(null)});
+ rep=teams[0]+"1";fmShow=false;resetT();buildReps();renderTeamCards();renderFM();render()
+}
+
+function openAudience(){
+ if(!aud||aud.closed){
+   aud=window.open("","NSBEFeudAudience","width=1400,height=850");
+   if(!aud){alert("Allow pop-ups for this file, then click again.");return}
+   aud.document.open();aud.document.write(aHTML());aud.document.close()
+ }
+ sync();aud.focus()
+}
+function aHTML(){return `<!doctype html><html><head><meta charset="utf-8"><title>NSBE Feud</title><style>
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;overflow:hidden;background:radial-gradient(circle at 50% 12%,#214fac 0,#0b2a73 42%,#020821 100%);color:white;font-family:Arial,sans-serif}
+.stage{height:100%;padding:2vh 2vw;display:grid;grid-template-rows:auto 1fr auto;gap:1.3vh}.top{display:grid;grid-template-rows:auto auto;align-items:center;gap:8px}.audScores{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}.sbox{min-width:130px;background:#020510;border:5px solid #d8aa31;border-radius:12px;text-align:center;padding:6px 10px}.sl{font-size:13px;font-weight:900;color:#ffe58b;letter-spacing:2px}.sn{font:900 36px/1 "Courier New",monospace;color:#ffd03b}.title{text-align:center;font-size:62px;font-weight:1000;color:#ffe276;text-shadow:0 4px 0 #795100,0 0 15px #ffc728}
+.center{display:grid;place-items:center}.marq{position:relative;width:min(1180px,95vw);height:min(650px,72vh);border-radius:70px;background:linear-gradient(#8b5807,#f1c951 11%,#9e6508 50%,#f3d05a 90%,#805008);padding:34px 40px;box-shadow:0 20px 42px #000b,inset 0 0 0 6px #ffe78a}.marq:before{content:"";position:absolute;inset:13px;border:5px dotted #fff1a5;border-radius:57px}
+.board{position:relative;z-index:1;height:100%;background:#061443;border:9px solid #0b276d;border-radius:39px;padding:68px 22px 22px;display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;align-content:center}.q{position:absolute;z-index:4;left:50%;top:18px;transform:translateX(-50%);width:78%;background:#fff2b9;color:#10265e;border:4px solid #d4a62a;border-radius:12px;padding:8px 15px;text-align:center;font-weight:900;font-size:29px}
+.tile{height:78px;position:relative;perspective:900px}.face{position:absolute;inset:0;border:3px solid #e6ba45;border-radius:8px;backface-visibility:hidden;transition:transform .45s ease;display:grid;align-items:center}.cover{background:linear-gradient(#1b5fce,#0c368d)}.cover span{justify-self:center;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle,#ffe98a,#cf9918);border:3px solid #fff0a6;color:#0d2f78;display:grid;place-items:center;font-weight:900;font-size:26px}.ans{grid-template-columns:1fr 88px;background:linear-gradient(#1654bc,#0d378b);transform:rotateX(90deg);font-size:25px;font-weight:900;text-transform:uppercase;overflow:hidden}.ans .txt{padding:0 14px}.ans .pts{height:100%;display:grid;place-items:center;background:#061b54;border-left:4px solid #e6ba45}.tile.show .cover{transform:rotateX(-90deg)}.tile.show .ans{transform:rotateX(0deg)}
+.bottom{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}.bank{justify-self:center;background:#020510;border:4px solid #dcae34;border-radius:10px;padding:7px 18px;color:#ffd23e;font:900 36px/1 "Courier New",monospace}.xs{justify-self:end;display:flex;gap:9px}.xx{width:52px;height:52px;border-radius:8px;background:#260606;border:3px solid #ff8282;color:#ff3737;display:grid;place-items:center;font-size:39px;font-weight:900;opacity:.18}.xx.on{opacity:1}.fs{justify-self:start;background:#ffffff1c;color:white;border:1px solid #ffffff44;border-radius:8px;padding:7px 10px}
+.fm{position:relative;z-index:1;height:100%;background:#061443;border:9px solid #0b276d;border-radius:39px;padding:22px;display:grid;grid-template-rows:auto 1fr auto;gap:10px}.fmt{text-align:center;font-size:52px;font-weight:1000;color:#ffe276}.fms{text-align:center;font-size:24px;font-weight:900}.rows{display:grid;gap:7px;align-content:center}.row{display:grid;grid-template-columns:1.1fr 1.2fr 85px;min-height:64px;border:3px solid #e3b63b;border-radius:8px;overflow:hidden;background:#0d3a90}.fq,.fa{padding:8px 11px;font-weight:900}.fa{background:#1656bf;text-transform:uppercase}.fp{display:grid;place-items:center;background:#051a52;font-weight:900;font-size:23px}.tot{text-align:center;font:900 34px/1 "Courier New",monospace;color:#ffd53d}
+</style></head><body><div class="stage"><div class="top"><div class="title" id="ttl">NSBE FEUD</div><div class="audScores" id="audScores"></div></div><div class="center"><div class="marq"><div id="inner"></div></div></div><div class="bottom"><button class="fs" onclick="document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()">FULL SCREEN</button><div class="bank" id="abank">BANK 0</div><div class="xs" id="axs"><div class="xx" id="ax1">X</div><div class="xx" id="ax2">X</div><div class="xx" id="ax3">X</div></div></div></div></body></html>`}
+
+function sync(){
+ if(!aud||aud.closed)return;
+ let d=aud.document;
+ let scoreHtml=teams.map(t=>`<div class="sbox"><div class="sl">TEAM ${t}</div><div class="sn">${scores[t]||0}</div></div>`).join("");
+ d.getElementById("audScores").innerHTML=scoreHtml;
+ if(mode==="regular"){
+   d.getElementById("ttl").textContent="NSBE FEUD";d.getElementById("abank").style.visibility="visible";d.getElementById("axs").style.visibility="visible";d.getElementById("abank").textContent="BANK "+getBank();
+   for(let i=1;i<=3;i++)d.getElementById("ax"+i).classList.toggle("on",i<=xs);
+   let q=D.regular[cur],h=`<div class="q">${q.q}</div><div class="board">`;
+   q.a.forEach((p,i)=>h+=`<div class="tile ${rev[cur][i]?"show":""}"><div class="face cover"><span>${i+1}</span></div><div class="face ans"><div class="txt">${p[0]}</div><div class="pts">${p[1]}</div></div></div>`);
+   h+="</div>";d.getElementById("inner").innerHTML=h
+ }else{
+   d.getElementById("ttl").textContent="FAST MONEY";d.getElementById("abank").style.visibility="hidden";d.getElementById("axs").style.visibility="hidden";
+   let h=`<div class="fm"><div><div class="fmt">FAST MONEY</div><div class="fms">Team ${repTeam(rep)} — Representative ${repNum(rep)}</div></div><div class="rows">`;
+   D.fast.forEach((q,qi)=>{let oi=fm[rep][qi],a=fmShow?(oi===null?"—":oi>=0?D.fast[qi].a[oi][0]:"OTHER"):"ANSWER HIDDEN",p=fmShow?(oi>=0?D.fast[qi].a[oi][1]:0):"—";h+=`<div class="row"><div class="fq">${qi+1}. ${q.q}</div><div class="fa">${a}</div><div class="fp">${p}</div></div>`});
+   h+=`</div><div class="tot">${fmShow?`REP SCORE ${rscore(rep)} · TEAM ${repTeam(rep)} TOTAL ${tscore(repTeam(rep))}`:"ANSWERS LOCKED"}</div></div>`;
+   d.getElementById("inner").innerHTML=h
+ }
+}
+init();
+</script>
+</body></html>
